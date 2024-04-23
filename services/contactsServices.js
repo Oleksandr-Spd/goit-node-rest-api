@@ -1,7 +1,8 @@
 import { readFile, writeFile } from "fs/promises";
 import path from "path";
+import HttpError from "../helpers/HttpError.js";
 
-const contactsPath = path.resolve("./db", "contacts.json");
+const contactsPath = path.resolve("db", "contacts.json");
 
 export async function listContacts() {
   try {
@@ -47,5 +48,27 @@ export async function addContact(name, email, phone) {
     return newContact;
   } catch (error) {
     return null;
+  }
+}
+export async function updatingContact(contactId, { name, email, phone }) {
+  try {
+    const contacts = await listContacts();
+    const index = contacts.findIndex((contact) => contact.id === contactId);
+    if (index === -1) {
+      throw new HttpError(404, "Not found");
+    }
+    const updatedContact = {
+      ...contacts[index],
+      name: name !== undefined ? name : contacts[index].name,
+      email: email !== undefined ? email : contacts[index].email,
+      phone: phone !== undefined ? phone : contacts[index].phone,
+    };
+
+    contacts[index] = updatedContact;
+
+    await writeFile(contactsPath, JSON.stringify(contacts));
+    return updatedContact;
+  } catch (error) {
+    throw new HttpError(409, "Conflict");
   }
 }
