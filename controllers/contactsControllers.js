@@ -47,10 +47,12 @@ export const updateContact = async (req, res) => {
   const { name, email, phone } = req.body;
 
   if (!name && !email && !phone) {
-    throw new HttpError(400, "Body must have at least one field");
+    res.status(400).json({ error: "Body must have at least one field" });
+    return;
   }
 
   const contact = await getContactById(id);
+
   if (!contact) {
     res.status(404).json({ error: "Contact not found" });
     return;
