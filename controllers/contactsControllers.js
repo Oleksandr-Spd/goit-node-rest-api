@@ -40,6 +40,7 @@ export const deleteContact = async (req, res) => {
 export const createContact = async (req, res) => {
   const { name, email, phone } = req.body;
   const newContact = await addContact(name, email, phone);
+
   res.status(201).json(newContact);
 };
 
@@ -60,6 +61,7 @@ export const updateContact = async (req, res) => {
   }
 
   const updatedContact = await updatingContact(id, { name, email, phone });
+
   res.status(200).json(updatedContact);
 };
 
