@@ -1,13 +1,10 @@
-import { readFile, writeFile } from "fs/promises";
-import path from "path";
 import HttpError from "../helpers/HttpError.js";
-
-const contactsPath = path.resolve("db", "contacts.json");
+import { ContactModel } from "../db/models/Contacts.js";
 
 export async function listContacts() {
   try {
-    const data = await readFile(contactsPath, "utf8");
-    return JSON.parse(data);
+    const data = await ContactModel.find();
+    return data;
   } catch (error) {
     return [];
   }
@@ -15,8 +12,7 @@ export async function listContacts() {
 
 export async function getContactById(contactId) {
   try {
-    const contacts = await listContacts();
-    const foundContact = contacts.find((contact) => contact.id === contactId);
+    const foundContact = await ContactModel.findById(contactId);
     return foundContact || null;
   } catch (error) {
     return null;
@@ -25,13 +21,8 @@ export async function getContactById(contactId) {
 
 export async function removeContact(contactId) {
   try {
-    const contacts = await listContacts();
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    if (index !== -1) {
-      const deletedContact = contacts.splice(index, 1)[0];
-      await writeFile(contactsPath, JSON.stringify(contacts));
-      return deletedContact;
-    } else return null;
+    const deletedContact = await ContactModel.findByIdAndDelete(contactId);
+    return deletedContact;
   } catch (error) {
     return null;
   }
@@ -39,12 +30,7 @@ export async function removeContact(contactId) {
 
 export async function addContact(name, email, phone) {
   try {
-    const contacts = await listContacts();
-    const newContact = { id: Date.now().toString(), name, email, phone };
-
-    contacts.push(newContact);
-
-    await writeFile(contactsPath, JSON.stringify(contacts));
+    const newContact = await ContactModel.create({ name, email, phone });
     return newContact;
   } catch (error) {
     return null;
@@ -52,23 +38,25 @@ export async function addContact(name, email, phone) {
 }
 export async function updatingContact(contactId, { name, email, phone }) {
   try {
-    const contacts = await listContacts();
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    if (index === -1) {
-      throw new HttpError(404, "Not found");
-    }
-    const updatedContact = {
-      ...contacts[index],
-      name: name !== undefined ? name : contacts[index].name,
-      email: email !== undefined ? email : contacts[index].email,
-      phone: phone !== undefined ? phone : contacts[index].phone,
-    };
-
-    contacts[index] = updatedContact;
-
-    await writeFile(contactsPath, JSON.stringify(contacts));
+    const updatedContact = await ContactModel.findByIdAndUpdate(
+      contactId,
+      { name, email, phone },
+      { new: true }
+    );
     return updatedContact;
   } catch (error) {
-    throw new HttpError(409, "Conflict");
+    throw new HttpError(404, "Not found");
+  }
+}
+export async function updateStatus(contactId, body) {
+  try {
+    const updatedContact = await ContactModel.findByIdAndUpdate(
+      contactId,
+      body,
+      { new: true }
+    );
+    return updatedContact;
+  } catch (error) {
+    throw new HttpError(404, "Not found");
   }
 }

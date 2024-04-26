@@ -4,6 +4,7 @@ import {
   getContactById,
   listContacts,
   removeContact,
+  updateStatus,
   updatingContact,
 } from "../services/contactsServices.js";
 
@@ -60,4 +61,12 @@ export const updateContact = async (req, res) => {
 
   const updatedContact = await updatingContact(id, { name, email, phone });
   res.status(200).json(updatedContact);
+};
+
+export const updateStatusContact = async (req, res) => {
+  const { id } = req.params;
+  const body = req.body;
+  const contact = await updateStatus(id, body);
+
+  res.status(200).json(contact);
 };
