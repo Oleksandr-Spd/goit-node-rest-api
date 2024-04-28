@@ -17,7 +17,7 @@ const contactSchema = new Schema(
       default: false,
     },
   },
-  { versionKey: "false" }
+  { versionKey: false }
 );
 
 export const ContactModel = model("contacts", contactSchema);
