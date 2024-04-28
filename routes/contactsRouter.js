@@ -9,6 +9,7 @@ import {
 } from "../controllers/contactsControllers.js";
 import {
   validCreateContact,
+  validateFavorites,
   validateUpdateContact,
 } from "../middlewares/contactMiddleware.js";
 
@@ -24,6 +25,6 @@ contactsRouter.post("/", validCreateContact, createContact);
 
 contactsRouter.put("/:id", validateUpdateContact, updateContact);
 
-contactsRouter.patch("/:id/favorite", updateStatusContact);
+contactsRouter.patch("/:id/favorite", validateFavorites, updateStatusContact);
 
 export default contactsRouter;
