@@ -1,4 +1,5 @@
-import HttpError from "../helpers/HttpError.js";
+import isValid from "../helpers/validateId.js";
+import validateIdContact from "../helpers/validateIdContact.js";
 import {
   addContact,
   getContactById,
@@ -14,27 +15,11 @@ export const getAllContacts = async (req, res) => {
 };
 
 export const getOneContact = async (req, res) => {
-  const { id } = req.params;
-  const contact = await getContactById(id);
-
-  if (!contact) {
-    res.status(404).json({ error: "Contact not found" });
-    return;
-  }
-
-  res.status(200).json(contact);
+  validateIdContact(req, res, getContactById);
 };
 
 export const deleteContact = async (req, res) => {
-  const { id } = req.params;
-  const contact = await removeContact(id);
-
-  if (!contact) {
-    res.status(404).json({ error: "Contact not found" });
-    return;
-  }
-
-  res.status(200).json(contact);
+  validateIdContact(req, res, removeContact);
 };
 
 export const createContact = async (req, res) => {
@@ -45,6 +30,9 @@ export const createContact = async (req, res) => {
 
 export const updateContact = async (req, res) => {
   const { id } = req.params;
+  if (!isValid(id)) {
+    return res.status(400).json({ message: "Invalid ID" });
+  }
   const { name, email, phone } = req.body;
 
   if (!name && !email && !phone) {
@@ -65,8 +53,17 @@ export const updateContact = async (req, res) => {
 
 export const updateStatusContact = async (req, res) => {
   const { id } = req.params;
+  if (!isValid(id)) {
+    return res.status(400).json({ message: "Invalid ID" });
+  }
   const body = req.body;
+
   const contact = await updateStatus(id, body);
+
+  if (!contact) {
+    res.status(404).json({ error: "Contact not found" });
+    return;
+  }
 
   res.status(200).json(contact);
 };

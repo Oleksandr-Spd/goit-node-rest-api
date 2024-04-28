@@ -57,6 +57,6 @@ export async function updateStatus(contactId, body) {
     );
     return updatedContact;
   } catch (error) {
-    throw new HttpError(404, "Not found");
+    return null;
   }
 }
