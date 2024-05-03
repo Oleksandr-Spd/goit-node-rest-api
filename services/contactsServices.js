@@ -1,9 +1,14 @@
 import HttpError from "../helpers/HttpError.js";
 import { ContactModel } from "../db/models/Contacts.js";
 
-export async function listContacts() {
+export async function listContacts(owner, page, limit) {
   try {
-    const data = await ContactModel.find();
+    const skip = (page - 1) * limit;
+
+    // if (favorite !== undefined) {
+    //   query.favorite = favorite === "true";
+    // }
+    const data = await ContactModel.find({ owner }).skip(skip).limit(limit);
     return data;
   } catch (error) {
     return [];
@@ -28,12 +33,12 @@ export async function removeContact(contactId) {
   }
 }
 
-export async function addContact(name, email, phone) {
+export async function addContact(name, email, phone, owner) {
   try {
-    const newContact = await ContactModel.create({ name, email, phone });
+    const newContact = await ContactModel.create({ name, email, phone, owner });
     return newContact;
   } catch (error) {
-    return null;
+    console.log(error.message);
   }
 }
 export async function updatingContact(contactId, { name, email, phone }) {
@@ -45,14 +50,14 @@ export async function updatingContact(contactId, { name, email, phone }) {
     );
     return updatedContact;
   } catch (error) {
-    throw new HttpError(404, "Not found");
+    throw HttpError(404, "Not found");
   }
 }
-export async function updateStatus(contactId, body) {
+export async function updateStatus(contactId, subscription) {
   try {
     const updatedContact = await ContactModel.findByIdAndUpdate(
       contactId,
-      body,
+      subscription,
       { new: true }
     );
     return updatedContact;
