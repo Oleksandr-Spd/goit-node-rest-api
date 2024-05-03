@@ -22,14 +22,13 @@ export async function findUserById(id) {
     }
     return user;
   } catch (error) {
-    // throw HttpError(400, "Bad Request");
-    console.log(error);
+    throw HttpError(400, "Bad Request");
   }
 }
 
 export async function updateUserWithToken(id) {
   try {
-    const token = jwt.sign({ id }, SECRET_KEY, { expiresIn: "22h" });
+    const token = jwt.sign({ id }, SECRET_KEY);
     const user = await UserModel.findByIdAndUpdate(
       id,
       { token },

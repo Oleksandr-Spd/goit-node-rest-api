@@ -11,8 +11,8 @@ import {
 
 export const getAllContacts = async (req, res) => {
   const { _id: owner } = req.user;
-  const { page = 1, limit = 20, favorite } = req.query;
-  const contacts = await listContacts(owner, page, limit, favorite);
+  const { page = 1, limit = 20 } = req.query;
+  const contacts = await listContacts(owner, page, limit);
   res.status(200).json(contacts);
 };
 

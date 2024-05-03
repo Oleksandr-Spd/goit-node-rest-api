@@ -1,13 +1,13 @@
 import HttpError from "../helpers/HttpError.js";
 import { ContactModel } from "../db/models/Contacts.js";
 
-export async function listContacts(owner, page, limit, favorite) {
+export async function listContacts(owner, page, limit) {
   try {
     const skip = (page - 1) * limit;
 
-    if (favorite !== undefined) {
-      query.favorite = favorite === "true";
-    }
+    // if (favorite !== undefined) {
+    //   query.favorite = favorite === "true";
+    // }
     const data = await ContactModel.find({ owner }).skip(skip).limit(limit);
     return data;
   } catch (error) {
